@@ -35,6 +35,14 @@ async function run() {
       res.send(result);
     })
 
+    // get specific assignment
+    app.get("/assignments/:id", async(req,res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await studyCollection.findOne(query);
+      res.send(result);
+    })
+
     // delete assignment
     app.delete("/assignments/:id",async(req,res)=>{
       const id = req.params.id;
