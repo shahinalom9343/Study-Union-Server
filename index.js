@@ -28,6 +28,15 @@ async function run() {
 
     const studyCollection = client.db("studyUnion").collection("assignments");
 
+    // get all assignments
+    app.get("/assignments", async(req,res)=>{
+      const cursor = studyCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+
+    // post created assignment
     app.post("/assignments",async(req,res)=>{
       const newAssignment = req.body;
       const result = await studyCollection.insertOne(newAssignment);
