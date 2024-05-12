@@ -35,12 +35,34 @@ async function run() {
       res.send(result);
     })
 
-    // get specific assignment
+    // get specific assignment for assignment details
     app.get("/assignments/:id", async(req,res)=>{
       const id = req.params.id;
       const query = {_id: new ObjectId(id)};
       const result = await studyCollection.findOne(query);
       res.send(result);
+    })
+    
+    // update assignment info
+    app.put("/assignments/:id", async(req,res)=>{
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+            const options = {upsert : true};
+      const updatedInfo = req.body;
+      const updated = {
+        $set:{
+           titleName : updatedInfo.titleName,
+           marks: updatedInfo.marks,
+           thumbnail: updatedInfo.thumbnail,
+           difficulty: updatedInfo.difficulty,
+           descriptions: updatedInfo.descriptions,
+           time: updatedInfo.time,
+           visitors: updatedInfo.visitors,
+        }
+      }
+      const result = await studyCollection.updateOne(filter,updated,options);
+      res.send(result);
+      
     })
 
     // delete assignment
