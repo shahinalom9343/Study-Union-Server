@@ -5,9 +5,15 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
 
+const corsOptions = {
+  origin:['http://localhost:5173'],
+  credentials:true,
+  optionSuccessStatus : 200,
+}
+
 // middleware
-app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions))
+app.use(express.json())
 
 // mongodb driver code
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.43teffq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -27,10 +33,18 @@ async function run() {
     // await client.connect();
 
     const studyCollection = client.db("studyUnion").collection("assignments");
+    const submittedCollection = client.db("studyUnion").collection("submittedAssignments");
 
     // get all assignments
     app.get("/assignments", async(req,res)=>{
       const cursor = studyCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    })
+
+    // get submitted assignments
+    app.get("/mysubmitted", async(req,res)=>{
+      const cursor = submittedCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     })
@@ -81,6 +95,15 @@ async function run() {
       const result = await studyCollection.insertOne(newAssignment);
       res.send(result);
     })
+
+    // post submitted assignments
+    app.post("/mysubmitted",async(req,res)=>{
+      const newSubmittedAssignment = req.body;
+      const result = await submittedCollection.insertOne(newSubmittedAssignment);
+      res.send(result);
+    })
+
+
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
